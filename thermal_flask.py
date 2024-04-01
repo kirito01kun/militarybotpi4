@@ -76,8 +76,8 @@ def constrain(val, min_val, max_val):
 def map_value(x, in_min, in_max, out_min, out_max):
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
-@app.route('/')
-def video_feed():
+@app.route('/th')
+def thermal_feed():
     return Response(thermal_plot(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == '__main__':
