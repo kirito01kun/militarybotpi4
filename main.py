@@ -1,11 +1,11 @@
 import time
 import threading
-from combined_flask import app
+#from combined_flask import app
 from nrf_receiver import receive_nrf
 
 if __name__ == "__main__":
-    flask_thread = threading.Thread(target=app.run, kwargs={"host": "0.0.0.0", "port": 5000})
-    flask_thread.start()
+    #flask_thread = threading.Thread(target=app.run, kwargs={"host": "0.0.0.0", "port": 5000})
+    #flask_thread.start()
 
     # Start NRF receiver
     nrf_thread = threading.Thread(target=receive_nrf)
