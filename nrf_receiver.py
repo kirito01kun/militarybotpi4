@@ -35,7 +35,7 @@ def receive_nrf(hostname='localhost', port=8888, address='1SNSR'):
                 if nrf.get_packages_lost() == 0:
                     print(f"Response sent: {response}")
                 else:
-                    print("Error sending response")
+                    print("...")
 
             # Sleep 100 ms.
             time.sleep(0.1)
