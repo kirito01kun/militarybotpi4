@@ -2,6 +2,7 @@ import argparse
 import traceback
 import time
 import pigpio
+import combined_flask as cf
 from nrf24 import *
 
 def receive_nrf(hostname='localhost', port=8888, address='1SNSR'):
@@ -26,7 +27,7 @@ def receive_nrf(hostname='localhost', port=8888, address='1SNSR'):
                 print(payload)
                 
                 # Send a response back to the sender
-                response = "temp=37"  # Example response
+                response = f"{cf.MAX_TEMP}"
                 nrf.reset_packages_lost()
                 nrf.send(response.encode())
                 nrf.wait_until_sent()

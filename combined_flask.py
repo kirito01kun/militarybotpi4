@@ -17,18 +17,20 @@ from io import BytesIO
 app = Flask(__name__)
 
 # Initialize the camera
-camera = Picamera2()
+#camera = Picamera2()
 
 # Configure preview
-preview_config = camera.create_preview_configuration(main={"size": (800, 600)})
-preview_config["transform"] = libcamera.Transform(hflip=1, vflip=1)
-camera.configure(preview_config)
+#preview_config = camera.create_preview_configuration(main={"size": (800, 600)})
+#preview_config["transform"] = libcamera.Transform(hflip=1, vflip=1)
+#camera.configure(preview_config)
 
 # Start the preview
 #camera.start_preview(Preview.QTGL)
 
 # Start the camera
-camera.start()
+#camera.start()
+
+MAX_TEMP = None
 
 def generate_frames():
     while True:
@@ -42,6 +44,7 @@ def generate_frames():
    
 @app.route('/thermal_plot')
 def thermal_plot():
+    global MAX_TEMP
     while True:
         i2c_bus = busio.I2C(board.SCL, board.SDA)
         sensor = adafruit_amg88xx.AMG88XX(i2c_bus)
@@ -49,6 +52,9 @@ def thermal_plot():
         MINTEMP = 10.0
         MAXTEMP = 22.0
         COLORDEPTH = 1024
+        
+        temp = max(max(row) for row in sensor.pixels)
+        MAX_TEMP = temp if int(temp) != 0 else MAX_TEMP
 
         points = [(math.floor(ix / 8), (ix % 8)) for ix in range(0, 64)]
         grid_x, grid_y = np.mgrid[0:7:32j, 0:7:32j]
