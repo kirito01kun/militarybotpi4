@@ -2,6 +2,7 @@ import argparse
 import traceback
 import time
 import pigpio
+import motors
 import combined_flask as cf
 from nrf24 import *
 
@@ -25,6 +26,7 @@ def receive_nrf(hostname='localhost', port=8888, address='1SNSR'):
 
                 # Show message received as hex.
                 print(payload)
+                motors.handle(payload)
                 
                 # Send a response back to the sender
                 response = f"{cf.MAX_TEMP}"

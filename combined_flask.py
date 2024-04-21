@@ -17,18 +17,18 @@ from io import BytesIO
 app = Flask(__name__)
 
 # Initialize the camera
-#camera = Picamera2()
+camera = Picamera2()
 
 # Configure preview
-#preview_config = camera.create_preview_configuration(main={"size": (800, 600)})
-#preview_config["transform"] = libcamera.Transform(hflip=1, vflip=1)
-#camera.configure(preview_config)
+preview_config = camera.create_preview_configuration(main={"size": (800, 600)})
+preview_config["transform"] = libcamera.Transform(hflip=1, vflip=0)
+camera.configure(preview_config)
 
 # Start the preview
 #camera.start_preview(Preview.QTGL)
 
 # Start the camera
-#camera.start()
+camera.start()
 
 MAX_TEMP = None
 
@@ -50,7 +50,7 @@ def thermal_plot():
         sensor = adafruit_amg88xx.AMG88XX(i2c_bus)
 
         MINTEMP = 10.0
-        MAXTEMP = 22.0
+        MAXTEMP = 25.0
         COLORDEPTH = 1024
         
         temp = max(max(row) for row in sensor.pixels)
@@ -93,8 +93,8 @@ def thermal_plot():
 
         img_str = pygame.image.tostring(lcd, 'RGB')
         image = Image.frombytes('RGB', (width, height), img_str)
-        image = image.rotate(90)
-        image = image.transpose(Image.FLIP_LEFT_RIGHT)
+        image = image.rotate(270)
+        #image = image.transpose(Image.FLIP_LEFT_RIGHT)
         img_io = BytesIO()
         image.save(img_io, format='JPEG')
         img_io.seek(0)
