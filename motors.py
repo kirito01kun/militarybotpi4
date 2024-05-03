@@ -148,23 +148,23 @@ def handle(cmd):
             print("STABLE: ", stable.STABLE)
             setup_gpio()
             if(cmd == 'u'):
-                forward()
-            elif(cmd == 'ul'):
-                forward(3.0)
-            elif(cmd == 'b'):
                 backward()
-            elif(cmd == 'bl'):
+            elif(cmd == 'ul'):
                 backward(3.0)
+            elif(cmd == 'b'):
+                forward()
+            elif(cmd == 'bl'):
+                forward(3.0)
             elif(cmd == 'r'):
-                left()
+                right()
                 print("left")
             elif(cmd == 'rl'):
-                left(1.0)
+                right(1.0)
             elif(cmd == 'l'):
-                right()
+                left()
                 print("right")
             elif(cmd == 'lel'):
-                right(1.0)
+                left(1.0)
             else:
                 servo(cmd)
     finally:
