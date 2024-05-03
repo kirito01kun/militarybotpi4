@@ -13,6 +13,8 @@ from colour import Color
 import adafruit_amg88xx
 from PIL import Image, ImageOps
 from io import BytesIO
+import stable
+import cv2
 
 app = Flask(__name__)
 
@@ -21,7 +23,8 @@ camera = Picamera2()
 
 # Configure preview
 preview_config = camera.create_preview_configuration(main={"size": (800, 600)})
-preview_config["transform"] = libcamera.Transform(hflip=1, vflip=0)
+
+#preview_config["transform"] = libcamera.Transform(hflip=1, vflip=0)
 camera.configure(preview_config)
 
 # Start the preview
@@ -32,14 +35,25 @@ camera.start()
 
 MAX_TEMP = None
 
+
 def generate_frames():
     while True:
         # Capture a JPEG image and return its data
         metadata = camera.capture_file("test.jpg")
-        with open("test.jpg", "rb") as f:
-            frame = f.read()
+        
+        # Read the captured image using OpenCV
+        frame = cv2.imread("test.jpg")
+
+        # Flip the image vertically if MPU is not detected
+        if stable.STABLE < 0:
+            frame = cv2.flip(frame, 0)  # Flip along the vertical axis
+
+        # Encode the flipped image to JPEG format
+        _, jpeg_frame = cv2.imencode('.jpg', frame)
+
+        # Yield the JPEG frame
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+               b'Content-Type: image/jpeg\r\n\r\n' + jpeg_frame.tobytes() + b'\r\n')
 
    
 @app.route('/thermal_plot')
@@ -50,7 +64,7 @@ def thermal_plot():
         sensor = adafruit_amg88xx.AMG88XX(i2c_bus)
 
         MINTEMP = 10.0
-        MAXTEMP = 25.0
+        MAXTEMP = 21.0
         COLORDEPTH = 1024
         
         temp = max(max(row) for row in sensor.pixels)
@@ -93,7 +107,10 @@ def thermal_plot():
 
         img_str = pygame.image.tostring(lcd, 'RGB')
         image = Image.frombytes('RGB', (width, height), img_str)
-        image = image.rotate(270)
+        if(stable.STABLE > 0):
+            image = image.rotate(270)
+        else:
+            image = image.rotate(90)
         #image = image.transpose(Image.FLIP_LEFT_RIGHT)
         img_io = BytesIO()
         image.save(img_io, format='JPEG')

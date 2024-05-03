@@ -1,5 +1,7 @@
 import RPi.GPIO as GPIO
 import time
+from mpu import read_accel
+import stable
 
 # Define GPIO pins 
 IN1 = 5
@@ -11,6 +13,12 @@ IN6 = 24
 IN7 = 12
 IN8 = 16
 SERVO_PIN = 18
+
+def get_mpu():
+    if read_accel() > 0:
+        stable.STABLE = 1
+    else:
+        stable.STABLE = -1
 
 # Initialize GPIO
 def setup_gpio():
@@ -26,7 +34,7 @@ def setup_gpio():
     GPIO.setup(IN8, GPIO.OUT)
     GPIO.setup(SERVO_PIN, GPIO.OUT)
 
-# Function to move both motors forward
+
 def forward(duration=.7):
     GPIO.output(IN1, GPIO.HIGH)
     GPIO.output(IN2, GPIO.LOW)
@@ -39,7 +47,7 @@ def forward(duration=.7):
     time.sleep(duration)
     stop()
 
-# Function to move both motors backward
+
 def backward(duration=.7):
     GPIO.output(IN1, GPIO.LOW)
     GPIO.output(IN2, GPIO.HIGH)
@@ -65,7 +73,7 @@ def left(duration=.3):
     time.sleep(duration)
     stop()
 
-# Function to move both motors backward
+
 def right(duration=.3):
     GPIO.output(IN1, GPIO.LOW)
     GPIO.output(IN2, GPIO.HIGH)
@@ -112,25 +120,53 @@ def cleanup():
 
 def handle(cmd):
     try:
-        setup_gpio()
-        if(cmd == 'u'):
-            forward()
-        elif(cmd == 'ul'):
-            forward(3.0)
-        elif(cmd == 'b'):
-            backward()
-        elif(cmd == 'bl'):
-            backward(3.0)
-        elif(cmd == 'r'):
-            right()
-        elif(cmd == 'rl'):
-            right(1.0)
-        elif(cmd == 'l'):
-            left()
-        elif(cmd == 'll'):
-            left(1.0)
+        get_mpu()
+        if(stable.STABLE > 0):
+            print("Stable: ", stable.STABLE)
+            setup_gpio()
+            if(cmd == 'u'):
+                forward()
+            elif(cmd == 'ul'):
+                forward(3.0)
+            elif(cmd == 'b'):
+                backward()
+            elif(cmd == 'bl'):
+                backward(3.0)
+            elif(cmd == 'r'):
+                right()
+                print("right")
+            elif(cmd == 'rl'):
+                right(1.0)
+            elif(cmd == 'l'):
+                left()
+                print("left")
+            elif(cmd == 'lel'):
+                left(1.0)
+            else:
+                servo(cmd)
         else:
-            servo(cmd)
+            print("STABLE: ", stable.STABLE)
+            setup_gpio()
+            if(cmd == 'u'):
+                forward()
+            elif(cmd == 'ul'):
+                forward(3.0)
+            elif(cmd == 'b'):
+                backward()
+            elif(cmd == 'bl'):
+                backward(3.0)
+            elif(cmd == 'r'):
+                left()
+                print("left")
+            elif(cmd == 'rl'):
+                left(1.0)
+            elif(cmd == 'l'):
+                right()
+                print("right")
+            elif(cmd == 'lel'):
+                right(1.0)
+            else:
+                servo(cmd)
     finally:
         stop()
         cleanup()

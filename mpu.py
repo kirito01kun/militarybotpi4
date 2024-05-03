@@ -20,6 +20,8 @@ MPU6050_ADDR = 0x68  # MPU6050 I2C address
 # Initialize I2C bus
 bus = smbus.SMBus(I2C_BUS)
 
+stand = 1
+
 # Function to read signed 16-bit value (2 bytes)
 def read_word_2c(reg):
     high = bus.read_byte_data(MPU6050_ADDR, reg)
@@ -48,18 +50,4 @@ def read_gyro():
 # Initialize MPU6050
 bus.write_byte_data(MPU6050_ADDR, REG_PWR_MGMT_1, 0)
 
-try:
-    while True:
-        accel_data = read_accel()
-        #gyro_data = read_gyro()
-        if accel_data > 0:
-            print("M9ad")
-        else:
-            print("M9lob")
-        time.sleep(.1)
-
-except KeyboardInterrupt:
-    pass
-finally:
-    bus.close()
 
